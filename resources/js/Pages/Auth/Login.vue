@@ -43,6 +43,7 @@ const submit = () => {
                     id="email"
                     type="email"
                     class="mt-1 block w-full"
+                    data-testid="email"
                     v-model="form.email"
                     required
                     autofocus
@@ -59,6 +60,7 @@ const submit = () => {
                     id="password"
                     type="password"
                     class="mt-1 block w-full"
+                    data-testid="pass"
                     v-model="form.password"
                     required
                     autocomplete="current-password"
@@ -83,7 +85,7 @@ const submit = () => {
                     Forgot your password?
                 </Link>
 
-                <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                <PrimaryButton data-testid="login" class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                     Log in
                 </PrimaryButton>
             </div>
