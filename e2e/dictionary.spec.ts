@@ -1,6 +1,5 @@
 import { test } from "@playwright/test";
-import { createReadStream } from "fs";
-import { createInterface } from "readline";
+import { readFileSync } from "fs";
 
 test("dictionary attack", async ({ page }) => {
     test.setTimeout(0);
@@ -13,31 +12,29 @@ test("dictionary attack", async ({ page }) => {
 
     const successMsg = page
         .locator("div", { hasText: "You're logged in!" })
-        .nth(0);
+        .nth(6);
 
-    const stream = createReadStream("./e2e/dictionary-list.txt")
-        .on("error", function (err) {
-            console.log("Error while reading file.", err);
-        })
-        .on("end", function () {
-            console.log("Read entire file.");
-        });
+    const dictionary = readFileSync("./e2e/dictionary-list.txt")
+        .toString()
+        .split("\n");
 
-    const rl = createInterface({
-        input: stream,
-        output: process.stdout,
-    });
-    const it = rl[Symbol.asyncIterator]();
-
-    let shouldCheck = true;
-    let password = (await it.next()).value;
-
-    while (shouldCheck) {
+    for (const password of dictionary) {
         await email.fill("test@test.test");
         await pass.fill(password);
         await loginButton.click();
 
-        shouldCheck = await successMsg.isHidden();
-        password = (await it.next()).value;
+        await page.locator("#nprogress").waitFor({
+            state: "attached",
+            timeout: 5000,
+        });
+
+        await page.locator("#nprogress").waitFor({
+            state: "detached",
+            timeout: 5000,
+        });
+
+        if (await successMsg.isVisible()) {
+            break;
+        }
     }
 });
